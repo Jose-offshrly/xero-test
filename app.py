@@ -120,25 +120,29 @@ def tenants():
         title="Xero Tenants",
         code=json.dumps(available_tenants, sort_keys=True, indent=4),
     )
-    
-    
+
+
 @app.route("/accounts")
 @xero_token_required
 def accounts():
     identity_api = IdentityApi(api_client)
     accounting_api = AccountingApi(api_client)
-    
+
     where = 'Status=="ACTIVE"'
-    order = 'Name ASC'
-    
+    order = "Name ASC"
+
     account_names = []
 
     for connection in identity_api.get_connections():
-        accounting_response = accounting_api.get_accounts(xero_tenant_id=connection.tenant_id, where=where, order=order)
+        accounting_response = accounting_api.get_accounts(
+            xero_tenant_id=connection.tenant_id,
+            where=where,
+            order=order,
+        )
         serialized_accounts = serialize(accounting_response)
         for account in serialized_accounts["Accounts"]:
             account_names.append(account["Name"])
-    
+
     return render_template(
         "code.html",
         title="Xero Accounts",
@@ -310,5 +314,5 @@ def get_xero_tenant_id():
             return connection.tenant_id
 
 
-if __name__ == '__main__':
-    app.run(host='localhost', port=5000)
+if __name__ == "__main__":
+    app.run(host="localhost", port=5000)
